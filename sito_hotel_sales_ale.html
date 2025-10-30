@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Ale — Hotel Sales Representative</title>
+  <meta name="description" content="Ale — Hotel Sales Representative | Ottimizzazione vendite, relazioni B2B, strategie revenue e pacchetti corporate." />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <style>
+    :root{--accent:#0b86d1;--muted:#6b7280;--bg:#f7fafc;--card:#ffffff}
+    *{box-sizing:border-box;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,'Helvetica Neue',Arial}
+    body{margin:0;background:var(--bg);color:#0f1724}
+    header{background:linear-gradient(90deg,#062a3b 0%, #0b86d1 100%);color:#fff;padding:28px 20px}
+    .container{max-width:1100px;margin:0 auto;padding:20px}
+    .brand{display:flex;align-items:center;gap:16px}
+    .logo{width:64px;height:64px;border-radius:12px;background:#fff;color:var(--accent);display:grid;place-items:center;font-weight:800}
+    nav{margin-left:auto}
+    nav a{color:#e6f6ff;margin-left:18px;text-decoration:none;font-weight:600}
+    .hero{display:flex;gap:24px;align-items:center;padding:40px 0}
+    .hero .left{flex:1}
+    h1{font-size:clamp(22px,4vw,36px);margin:0 0 12px}
+    p.lead{margin:0 0 18px;color:var(--muted)}
+    .cta{display:inline-block;background:var(--accent);color:#fff;padding:12px 18px;border-radius:10px;text-decoration:none;font-weight:700}
+    .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:24px}
+    .card{background:var(--card);padding:18px;border-radius:12px;box-shadow:0 6px 18px rgba(11,134,209,0.08)}
+    .languages{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+    .lang{padding:8px 12px;border-radius:999px;background:#eef6fb;font-weight:600}
+    section{padding:28px 0}
+    .two-col{display:grid;grid-template-columns:1fr 360px;gap:24px}
+    .skills{display:flex;flex-direction:column;gap:12px}
+    .skill{display:flex;justify-content:space-between}
+    footer{padding:20px 0;color:var(--muted);font-size:14px}
+    @media(max-width:880px){.hero{flex-direction:column}.two-col{grid-template-columns:1fr}}
+    .lang-switch{margin-left:12px}
+    .contact-card{position:sticky;top:20px}
+    .social{display:flex;gap:10px;margin-top:12px}
+    .social a{display:inline-block;padding:8px;border-radius:8px;background:#fff;text-decoration:none}
+    .badge{display:inline-block;padding:6px 10px;border-radius:8px;background:#fff;font-weight:700}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container" style="display:flex;align-items:center">
+      <div class="brand">
+        <div class="logo">AS</div>
+        <div>
+          <div style="font-weight:800">Ale — Hotel Sales Representative</div>
+          <div style="font-size:13px;color:rgba(255,255,255,0.85)">Specialista in gruppi, corporate & OTA partnerships</div>
+        </div>
+      </div>
+      <nav>
+        <a href="#about">Chi sono</a>
+        <a href="#services">Servizi</a>
+        <a href="#testimonials">Referenze</a>
+        <a href="#contact">Contatti</a>
+        <select id="langSelect" class="lang-switch" onchange="switchLang(this.value)">
+          <option value="it">Italiano</option>
+          <option value="en">English</option>
+          <option value="es">Español</option>
+          <option value="fr">Français</option>
+          <option value="zh">中文 (简体)</option>
+        </select>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero" id="hero">
+      <div class="left">
+        <h1 id="title">Esperto Hotel Sales — Trasformo opportunità in contratti</h1>
+        <p class="lead" id="subtitle">Aiuto hotel a crescere attraverso strategie commerciali mirate, pacchetti corporate e relazioni B2B — con focus su risultati misurabili e partnership durature.</p>
+        <a class="cta" href="#contact" id="cta">Contattami subito</a>
+        <div class="languages" id="langBadges">
+          <div class="lang">Italiano • Madrelingua</div>
+          <div class="lang">English • Fluent</div>
+          <div class="lang">Español • Avanzato</div>
+          <div class="lang">Français • Intermedio</div>
+          <div class="lang">中文 • Base</div>
+        </div>
+      </div>
+      <div style="width:360px">
+        <div class="card">
+          <div style="font-weight:800;font-size:18px">Offerta Rapida</div>
+          <div style="margin-top:8px;color:var(--muted)">Pacchetti su misura per gruppi, MICE e corporate. Aumento conversione & gestione contratti.</div>
+          <div style="margin-top:12px;font-weight:700">Risultati concreti:</div>
+          <ul style="margin:8px 0 0 18px;color:var(--muted)">
+            <li>+20% RevPAR per clienti corporate</li>
+            <li>Riduzione cancellazioni con policy flessibili</li>
+            <li>Apertura canali OTA selezionati</li>
+          </ul>
+          <div style="margin-top:12px;display:flex;gap:8px">
+            <a class="cta" href="#contact">Richiedi consulenza</a>
+            <a href="#services" style="padding:10px 12px;border-radius:8px;background:#eef6fb;text-decoration:none;font-weight:700;color:var(--accent)">Vedi servizi</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="about">
+      <div class="two-col">
+        <div>
+          <h2 id="aboutTitle">Chi sono</h2>
+          <p id="aboutText">Sono un Hotel Sales Representative con esperienza pluriennale in catene e strutture indipendenti. Mi concentro su acquisizione clienti B2B, corporate accounts, offerte per gruppi e strategie di pricing. La mia forza è costruire relazioni di fiducia con travel manager, agenzie MICE e partner aziendali.</p>
+
+          <div class="card" style="margin-top:18px">
+            <h3 style="margin:0 0 8px">Competenze chiave</h3>
+            <div class="skills">
+              <div class="skill"><span>Negoziazione contratti</span><strong>✔︎</strong></div>
+              <div class="skill"><span>Account management</span><strong>✔︎</strong></div>
+              <div class="skill"><span>Revenue & pricing</span><strong>✔︎</strong></div>
+              <div class="skill"><span>Event & group handling</span><strong>✔︎</strong></div>
+              <div class="skill"><span>Multilingue & mediazione</span><strong>✔︎</strong></div>
+            </div>
+          </div>
+
+          <h3 style="margin-top:18px" id="languagesTitle">Lingue parlate</h3>
+          <p id="languagesText">Parlo correntemente Italiano e Inglese; lavoro regolarmente con interlocutori in Spagnolo, Francese e cinese di base. Posso gestire trattative e presentazioni in queste lingue per aprire mercati internazionali.</p>
+        </div>
+
+        <aside class="contact-card">
+          <div class="card">
+            <div style="font-weight:800">Contattami</div>
+            <div style="margin-top:8px;color:var(--muted)">Disponibile per consulenze, interim management e proposte di partnership.</div>
+            <div style="margin-top:12px">
+              <div style="font-weight:700">Email</div>
+              <div style="color:var(--muted)"><a href="mailto:tuo.nome@email.it">tuo.nome@email.it</a></div>
+            </div>
+            <div style="margin-top:8px">
+              <div style="font-weight:700">Telefono</div>
+              <div style="color:var(--muted)">+39 333 000 0000</div>
+            </div>
+            <div class="social">
+              <a href="#">LinkedIn</a>
+              <a href="#">Instagram</a>
+            </div>
+            <div style="margin-top:12px">
+              <a href="#" style="text-decoration:none" id="cvLink">Scarica il CV (PDF)</a>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section id="services">
+      <h2>Servizi</h2>
+      <div class="cards">
+        <div class="card">
+          <h3>Account Corporate</h3>
+          <p>Ricerca, acquisizione e mantenimento di contratti corporate: travel policy, tariffe business e report trimestrali.</p>
+        </div>
+        <div class="card">
+          <h3>Gruppi & MICE</h3>
+          <p>Gestione completa pacchetti gruppi, contrattualistica per eventi e supporto operativo pre/post evento.</p>
+        </div>
+        <div class="card">
+          <h3>Strategia Revenue</h3>
+          <p>Analisi tariffe, segmentazione mercato e attivazione canali OTA selezionati per massimizzare RevPAR.</p>
+        </div>
+        <div class="card">
+          <h3>Formazione & Sales Coaching</h3>
+          <p>Sessioni formative per team sales, tecniche di upselling e gestione pipeline commerciale.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="testimonials">
+      <h2>Referenze</h2>
+      <div class="cards">
+        <div class="card">
+          <strong>Hotel Aurora — Direttore Generale</strong>
+          <p style="color:var(--muted)">"Grazie ad Ale abbiamo rinnovato i contratti corporate e aperto 3 nuovi mercati europei con incremento fatturato del 18% in 9 mesi."</p>
+        </div>
+        <div class="card">
+          <strong>Catena BellaVista — Revenue Manager</strong>
+          <p style="color:var(--muted)">"Eccellente capacità di negoziazione e attenzione al dettaglio commerciale. Partner affidabile per progetti MICE."</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="contact">
+      <h2>Parliamo</h2>
+      <div class="two-col">
+        <div>
+          <p style="color:var(--muted)">Lasciami un messaggio e ti risponderò in 24-48 ore.</p>
+          <form onsubmit="sendForm(event)" style="display:flex;flex-direction:column;gap:8px;max-width:640px">
+            <input id="name" placeholder="Nome e Cognome" required style="padding:10px;border-radius:8px;border:1px solid #e6eef6" />
+            <input id="email" placeholder="Email" type="email" required style="padding:10px;border-radius:8px;border:1px solid #e6eef6" />
+            <input id="company" placeholder="Azienda (opzionale)" style="padding:10px;border-radius:8px;border:1px solid #e6eef6" />
+            <textarea id="message" placeholder="Messaggio" rows="6" style="padding:10px;border-radius:8px;border:1px solid #e6eef6" required></textarea>
+            <div style="display:flex;gap:8px;align-items:center">
+              <button class="cta" type="submit">Invia messaggio</button>
+              <div style="color:var(--muted)">oppure <a href="mailto:tuo.nome@email.it">scrivimi via email</a></div>
+            </div>
+            <div id="formResult" style="color:green;font-weight:700"></div>
+          </form>
+        </div>
+        <aside>
+          <div class="card">
+            <h3 style="margin:0 0 8px">Disponibilità</h3>
+            <p style="color:var(--muted)">Disponibile per collaborazioni in Italia ed Europa. Offro presentazioni in lingua inglese e spagnola su richiesta.</p>
+            <div style="margin-top:12px">
+              <a href="#" class="badge">Prenota una call</a>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <div class="container" style="display:flex;justify-content:space-between;align-items:center">
+      <div>© <span id="year"></span> Ale — Hotel Sales Representative</div>
+      <div style="color:var(--muted)">Made with care • Disponibile in più lingue</div>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('year').innerText = new Date().getFullYear();
+
+    const translations = {
+      it: {
+        title: 'Esperto Hotel Sales — Trasformo opportunità in contratti',
+        subtitle: 'Aiuto hotel a crescere attraverso strategie commerciali mirate, pacchetti corporate e relazioni B2B — con focus su risultati misurabili e partnership durature.',
+        cta: 'Contattami subito',
+        aboutTitle: 'Chi sono',
+        aboutText: 'Sono un Hotel Sales Representative con esperienza pluriennale in catene e strutture indipendenti. Mi concentro su acquisizione clienti B2B, corporate accounts, offerte per gruppi e strategie di pricing. La mia forza è costruire relazioni di fiducia con travel manager, agenzie MICE e partner aziendali.',
+        languagesTitle: 'Lingue parlate',
+        languagesText: 'Parlo correntemente Italiano e Inglese; lavoro regolarmente con interlocutori in Spagnolo, Francese e cinese di base. Posso gestire trattative e presentazioni in queste lingue per aprire mercati internazionali.'
+      },
+      en: {
+        title: 'Hotel Sales Expert — Turning opportunities into contracts',
+        subtitle: 'I help hotels grow through focused commercial strategies, corporate packages and B2B relationships — targeting measurable results and lasting partnerships.',
+        cta: 'Contact me',
+        aboutTitle: 'About me',
+        aboutText: 'I am a Hotel Sales Representative with several years of experience in chains and independent properties. I focus on B2B client acquisition, corporate accounts, group offers and pricing strategies. My strength is building trust with travel managers, MICE agencies and corporate partners.',
+        languagesTitle: 'Languages',
+        languagesText: 'I speak Italian and English fluently; I regularly work with Spanish, French and basic Chinese speakers. I can manage negotiations and presentations in these languages to open international markets.'
+      },
+      es: {
+        title: 'Especialista en Hotel Sales — Convierto oportunidades en contratos',
+        subtitle: 'Ayudo a los hoteles a crecer mediante estrategias comerciales enfocadas, paquetes corporativos y relaciones B2B — con resultados medibles y alianzas duraderas.',
+        cta: 'Contáctame',
+        aboutTitle: 'Sobre mí',
+        aboutText: 'Soy un Hotel Sales Representative con varios años de experiencia en cadenas y propiedades independientes. Me centro en la adquisición de clientes B2B, cuentas corporativas, ofertas para grupos y estrategias de precios. Mi fortaleza es construir relaciones de confianza con travel managers, agencias MICE y socios corporativos.',
+        languagesTitle: 'Idiomas',
+        languagesText: 'Hablo italiano e inglés con fluidez; trabajo regularmente con interlocutores en español, francés y chino básico. Puedo gestionar negociaciones y presentaciones en estos idiomas para abrir mercados internacionales.'
+      },
+      fr: {
+        title: 'Expert en Hotel Sales — Transformer les opportunités en contrats',
+        subtitle: 'J’aide les hôtels à croître grâce à des stratégies commerciales ciblées, des forfaits corporate et des relations B2B — axés sur des résultats mesurables et des partenariats durables.',
+        cta: 'Contactez-moi',
+        aboutTitle: 'À propos',
+        aboutText: "Je suis un Hotel Sales Representative avec plusieurs années d'expérience dans des chaînes et des établissements indépendants. Je me concentre sur l'acquisition de clients B2B, les comptes corporate, les offres pour groupes et les stratégies de tarification. Ma force est de construire des relations de confiance avec les travel managers, les agences MICE et les partenaires d'entreprise.",
+        languagesTitle: 'Langues',
+        languagesText: 'Je parle couramment l’italien et l’anglais ; je travaille régulièrement avec des interlocuteurs en espagnol, français et chinois de base. Je peux gérer des négociations et des présentations dans ces langues pour ouvrir des marchés internationaux.'
+      },
+      zh: {
+        title: '酒店銷售專家 — 將機會轉化為合約',
+        subtitle: '我通過針對性的商業策略、企業套餐和B2B關係幫助酒店成長——專注於可衡量的結果和持久的合作夥伴關係。',
+        cta: '聯絡我',
+        aboutTitle: '關於我',
+        aboutText: '我是一名具有多年經驗的酒店銷售代表，在連鎖酒店和獨立酒店都有工作經驗。我專注於B2B客戶開發、企業賬戶、團體方案和定價策略。我的優勢是與差旅經理、MICE機構和企業夥伴建立信任關係。',
+        languagesTitle: '語言',
+        languagesText: '我會流利使用意大利語和英語；我經常與講西班牙語、法語和基礎中文的客戶合作。我可以用這些語言進行談判和演示，以打開國際市場。'
+      }
+    };
+
+    function switchLang(code){
+      const t = translations[code] || translations.it;
+      document.getElementById('title').innerText = t.title;
+      document.getElementById('subtitle').innerText = t.subtitle;
+      document.getElementById('cta').innerText = t.cta;
+      document.getElementById('aboutTitle').innerText = t.aboutTitle;
+      document.getElementById('aboutText').innerText = t.aboutText;
+      document.getElementById('languagesTitle').innerText = t.languagesTitle;
+      document.getElementById('languagesText').innerText = t.languagesText;
+
+      // update language badges to emphasize multilingual service
+      const badges = {
+        it: ['Italiano • Madrelingua','English • Fluent','Español • Avanzado','Français • Intermédiaire','中文 • 基礎'],
+        en: ['Italian • Native','English • Fluent','Spanish • Advanced','French • Intermediate','Chinese • Basic'],
+        es: ['Italiano • Nativo','Inglés • Fluido','Español • Avanzado','Francés • Intermedio','Chino • Básico'],
+        fr: ['Italien • Natif','Anglais • Courant','Espagnol • Avancé','Français • Intermédiaire','Chinois • Débutant'],
+        zh: ['意大利語 • 母語','英語 • 流利','西班牙語 • 高級','法語 • 中級','中文 • 基礎']
+      };
+      const container = document.getElementById('langBadges');
+      container.innerHTML = badges[code].map(b=>`<div class="lang">${b}</div>`).join('');
+    }
+
+    function sendForm(e){
+      e.preventDefault();
+      const name=document.getElementById('name').value;
+      const email=document.getElementById('email').value;
+      const company=document.getElementById('company').value;
+      const message=document.getElementById('message').value;
+      // fallback: create mailto (replace with backend if available)
+      const subject = encodeURIComponent('Richiesta da sito - '+name);
+      const body = encodeURIComponent('Nome: '+name+'\nEmail: '+email+'\nAzienda: '+company+'\n\n'+message);
+      window.location.href = `mailto:tuo.nome@email.it?subject=${subject}&body=${body}`;
+      document.getElementById('formResult').innerText = 'Apertura client email...';
+    }
+
+    // set default language to Italian
+    switchLang('it');
+  </script>
+</body>
+</html>

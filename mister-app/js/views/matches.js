@@ -1,4 +1,5 @@
 import * as db from '../db.js';
+import { chooseFileAsAdmin } from '../admin.js';
 import { esc, on, toast, confirmDialog, pick, sheet, fullName, fmtDate, clock, num, pct, today, chooseFile, readText, $, $$ } from '../util.js';
 import { setHeader, loadSeason, state, route, byNumber } from '../app.js';
 import {
@@ -30,7 +31,7 @@ export async function matchesView(root) {
   const ctx = await loadSeason();
   setHeader({ title: 'Partite', actions: `<a class="hdr-btn" href="#/partita/nuova" aria-label="Nuova partita">＋</a>` });
   if (!ctx.matches.length) {
-    root.innerHTML = `<div class="empty"><div class="empty-icon">📅</div><p>Nessuna partita in questa stagione.</p><a class="btn primary" href="#/partita/nuova">Crea la prima partita</a></div>`;
+    root.innerHTML = `<a class="btn block mb" href="#/calendario">📆 Calendario di tutte le squadre</a><div class="empty"><div class="empty-icon">📅</div><p>Nessuna partita in questa stagione.</p><a class="btn primary" href="#/partita/nuova">Crea la prima partita</a></div>`;
     return;
   }
   const res = { v: 0, n: 0, p: 0 };
@@ -49,6 +50,7 @@ export async function matchesView(root) {
     </a>`;
   });
   root.innerHTML = `
+    <a class="btn block mb" href="#/calendario">📆 Calendario di tutte le squadre</a>
     <div class="record"><span class="win">${res.v} V</span><span class="draw">${res.n} N</span><span class="loss">${res.p} P</span></div>
     <div class="list">${items.join('')}</div>`;
 }
@@ -407,7 +409,7 @@ function chooseOnField(m, players, current, title) {
 // ---------- Import tracking ----------
 
 async function importTrackingFlow(m, ctx, existing) {
-  const file = await chooseFile('application/json,.json');
+  const file = await chooseFileAsAdmin('application/json,.json', 'Le importazioni sono riservate all\'amministratore.');
   if (!file) return;
   let parsed;
   try {

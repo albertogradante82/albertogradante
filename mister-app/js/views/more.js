@@ -1,4 +1,5 @@
 import * as db from '../db.js';
+import { chooseFileAsAdmin } from '../admin.js';
 import { esc, on, toast, confirmDialog, pick, shareOrDownload, chooseFile, readText, fullName, sheet, $ } from '../util.js';
 import { setHeader, setCurrent, route, loadSeason, state, byNumber } from '../app.js';
 import * as sync from '../sync.js';
@@ -203,7 +204,7 @@ export async function exportBackup() {
 }
 
 async function restoreBackup() {
-  const file = await chooseFile('application/json,.json');
+  const file = await chooseFileAsAdmin('application/json,.json', 'Le importazioni sono riservate all\'amministratore.');
   if (!file) return;
   try {
     const json = JSON.parse(await readText(file));
@@ -224,7 +225,7 @@ async function restoreBackup() {
 // ---------- Importazione rose (unione, non sostituzione) ----------
 
 async function importRose() {
-  const file = await chooseFile('application/json,.json');
+  const file = await chooseFileAsAdmin('application/json,.json', 'Le importazioni sono riservate all\'amministratore.');
   if (!file) return;
   try {
     const json = JSON.parse(await readText(file));

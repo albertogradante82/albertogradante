@@ -92,8 +92,8 @@ export async function moreView(root) {
         <button class="btn primary grow" data-action="export">Esporta backup</button>
         <button class="btn grow" data-action="import">Importa backup</button>
       </div>
-      <button class="btn block mt" data-action="importRose">Importa rose (squadre e giocatori)</button>
-      <p class="small muted">"Importa rose" aggiunge squadre e giocatori da un file preparato (es. dagli elenchi Excel della società) senza cancellare i dati presenti.</p>
+      <button class="btn block mt" data-action="importRose">Importa rose o calendario</button>
+      <p class="small muted">"Importa rose o calendario" aggiunge squadre, giocatori o partite da un file preparato (es. elenchi Excel della società, calendari del campionato) senza cancellare i dati presenti.</p>
     </div>
 
     <h2 class="section">File di tracking</h2>
@@ -238,13 +238,25 @@ async function importRose() {
 /** Aggiunge squadre, stagioni e giocatori. I dati già presenti (es. numeri inseriti a mano) hanno la precedenza. */
 async function mergeRose(json) {
   const teams = json.data.teams || [], seasons = json.data.seasons || [], players = json.data.players || [];
-  const summary = teams.map((t) => `• ${t.name}: ${players.filter((p) => p.teamId === t.id).length} giocatori`).join('\n');
-  if (!(await confirmDialog(`Importare ${teams.length} squadre e ${players.length} giocatori?\n${summary}\n\nI dati già presenti non vengono cancellati.`, 'Importa'))) return;
+  const matches = json.data.matches || [], events = json.data.events || [];
+  // le partite devono appartenere a una squadra/stagione presente nel file o già nell'app
+  const knownSeasons = new Set([...seasons.map((s) => s.id), ...(await db.all('seasons')).map((s) => s.id)]);
+  const orphan = matches.filter((m) => !knownSeasons.has(m.seasonId)).length;
+  if (orphan) { toast(`${orphan} partite appartengono a una squadra non presente: importa prima le rose.`, 5000); return; }
+  const allTeams = [...teams, ...(await db.all('teams'))];
+  const lines = [
+    ...teams.map((t) => `• ${t.name}: ${players.filter((p) => p.teamId === t.id).length} giocatori`),
+    ...[...new Set(matches.map((m) => m.teamId))].map((tid) => `• ${allTeams.find((t) => t.id === tid)?.name || 'Squadra'}: ${matches.filter((m) => m.teamId === tid).length} partite`),
+  ];
+  const what = [teams.length && `${teams.length} squadre`, players.length && `${players.length} giocatori`, matches.length && `${matches.length} partite`, events.length && `${events.length} eventi (gol)`].filter(Boolean).join(', ');
+  if (!(await confirmDialog(`Importare ${what}?\n${lines.join('\n')}\n\nI dati già presenti non vengono cancellati.`, 'Importa'))) return;
   const filled = (v) => v !== '' && v != null && !(Array.isArray(v) && !v.length);
   const merge = (imp, cur) => {
     if (!cur) return imp;
     const out = { ...imp };
     Object.entries(cur).forEach(([k, v]) => { if (filled(v) && k !== 'custom' && k !== 'customFields') out[k] = v; });
+    // un risultato importato chiude la partita
+    if (imp.status === 'finita') out.status = 'finita';
     if (imp.custom || cur.custom) {
       out.custom = { ...(imp.custom || {}) };
       Object.entries(cur.custom || {}).forEach(([k, v]) => { if (filled(v)) out.custom[k] = v; });
@@ -263,8 +275,10 @@ async function mergeRose(json) {
   await write('teams', teams);
   await write('seasons', seasons);
   await write('players', players);
+  await write('matches', matches);
+  await write('events', events);
   if (!state.teamId && teams[0]) await setCurrent(teams[0].id, seasons.find((s) => s.teamId === teams[0].id)?.id || null);
-  toast(`Importate ${teams.length} squadre e ${players.length} giocatori`);
+  toast(`Importati: ${what}`);
   location.hash = '#/altro';
   route();
 }

@@ -1,6 +1,7 @@
 import * as db from '../db.js';
 import { esc, on, toast, confirmDialog, pick, shareOrDownload, chooseFile, readText, fullName, sheet, $ } from '../util.js';
 import { setHeader, setCurrent, route, loadSeason, state, byNumber } from '../app.js';
+import * as sync from '../sync.js';
 
 const CATEGORIES = ['Piccoli Amici', 'Primi Calci', 'Pulcini', 'Esordienti', 'Giovanissimi', 'Allievi', 'Juniores', 'Altro'];
 
@@ -26,9 +27,23 @@ export async function onboardingView(root) {
       <button class="btn primary block">Inizia</button>
     </form>
     <div class="card">
+      <p class="small"><strong>Ti hanno dato un codice?</strong> Entra nell'archivio condiviso e trovi già squadre, giocatori e partite.</p>
+      <div class="row gap"><input id="joincode" class="grow code-input" placeholder="Codice di accesso" autocomplete="off" autocapitalize="off"><button class="btn primary" id="join">Entra</button></div>
+    </div>
+    <div class="card">
       <p class="muted small">Hai già un backup? </p>
       <button class="btn block" id="restore">Ripristina da file di backup</button>
     </div>`;
+  $('#join', root).onclick = async () => {
+    const code = $('#joincode', root).value;
+    if (!code.trim()) { toast('Inserisci il codice'); return; }
+    toast('Collegamento in corso…');
+    try {
+      const r = await sync.connect(code);
+      toast(`Collegato: ${r.received} elementi scaricati`);
+      route();
+    } catch (e) { toast(e.message, 4000); }
+  };
   $('#f', root).onsubmit = async (e) => {
     e.preventDefault();
     const f = new FormData(e.target);
@@ -52,6 +67,9 @@ export async function moreView(root) {
   const lastBackup = await db.getMeta('lastBackup');
 
   root.innerHTML = `
+    <h2 class="section">Archivio condiviso</h2>
+    <div class="card" id="syncCard"></div>
+
     <h2 class="section">Squadre e stagioni</h2>
     <div class="list">
       ${teams.map((t) => `<a class="item" href="#/squadra/${t.id}">
@@ -68,7 +86,7 @@ export async function moreView(root) {
 
     <h2 class="section">Backup</h2>
     <div class="card">
-      <p class="small muted">Tutti i dati sono salvati solo su questo dispositivo. Esporta regolarmente un backup (es. su File/iCloud Drive) per non perderli e per spostarli su un altro telefono.</p>
+      <p class="small muted">Oltre all'eventuale archivio condiviso, i dati sono salvati su questo dispositivo. Esporta regolarmente un backup (es. su File/iCloud Drive) per non perderli e per spostarli su un altro telefono.</p>
       <p class="small">Ultimo backup: <strong>${lastBackup ? new Date(lastBackup).toLocaleString('it-IT') : 'mai'}</strong>${persisted ? '' : ' · <span class="warn">archivio non protetto dalla pulizia automatica del browser</span>'}</p>
       <div class="row gap">
         <button class="btn primary grow" data-action="export">Esporta backup</button>
@@ -105,17 +123,70 @@ export async function moreView(root) {
       <button class="btn danger block mt" data-action="wipe">Cancella tutti i dati</button>
     </div>`;
 
+  renderSyncCard($('#syncCard', root), teams.length > 0);
   on(root, 'export', exportBackup);
   on(root, 'import', restoreBackup);
   on(root, 'merge', () => mergePlayers(players));
   on(root, 'fields', () => editCustomFields(team));
   on(root, 'wipe', async () => {
-    if (!(await confirmDialog('Eliminare definitivamente TUTTI i dati dell\'app da questo dispositivo?', 'Elimina tutto', true))) return;
+    if (!(await confirmDialog('Eliminare definitivamente TUTTI i dati dell\'app da questo dispositivo? Se sei collegato all\'archivio condiviso, i dati online non vengono toccati e verranno riscaricati.', 'Elimina tutto', true))) return;
     await db.importAll({ app: 'mister-app', data: {} });
     toast('Dati eliminati');
     location.hash = '#/partite';
     route();
   });
+}
+
+// ---------- Archivio condiviso ----------
+
+async function renderSyncCard(el, hasLocalData) {
+  const cfg = await sync.getConfig();
+  if (!cfg.enabled) {
+    el.innerHTML = `
+      <p class="small">Con l'archivio condiviso tutti i mister che hanno il <strong>codice di accesso</strong> vedono e modificano le stesse squadre, giocatori, partite, eventi e tracking. Ogni telefono tiene una copia: l'app funziona anche offline e si aggiorna appena c'è rete.</p>
+      <p class="small warn">Attenzione: chi ha il codice vede anche foto, date di nascita, contatti dei genitori e visite mediche dei ragazzi. Dai il codice solo a persone dello staff.</p>
+      <label class="small muted">Codice di accesso<input id="scode" class="code-input" autocomplete="off" autocapitalize="off" value="${esc(cfg.code || '')}"></label>
+      ${hasLocalData ? `<label class="switch small mt"><input type="checkbox" id="supload" checked> Carica nell'archivio anche i dati già presenti su questo telefono</label>` : ''}
+      <button class="btn primary block mt" id="sconnect">Collega</button>`;
+    el.querySelector('#sconnect').onclick = async () => {
+      const code = el.querySelector('#scode').value;
+      if (!code.trim()) { toast('Inserisci il codice'); return; }
+      toast('Collegamento in corso…');
+      try {
+        const up = el.querySelector('#supload');
+        const r = await sync.connect(code, { uploadLocal: !!(up && up.checked) });
+        toast(`Collegato · inviati ${r.sent}, ricevuti ${r.received}`);
+        route();
+      } catch (e) { toast(e.message, 4000); }
+    };
+    return;
+  }
+  const draw = (st) => {
+    const label = { ok: 'Sincronizzato', syncing: 'Sincronizzazione in corso…', offline: 'Offline', error: 'Errore', off: 'Non collegato' }[st.state] || st.state;
+    el.innerHTML = `
+      <div class="status-line"><span class="dot ${st.state === 'ok' ? 'ok' : st.state === 'error' ? 'err' : st.state === 'syncing' ? 'syncing' : ''}"></span><strong>${esc(label)}</strong></div>
+      <p class="small muted">${st.lastSync ? 'Ultimo aggiornamento: ' + new Date(st.lastSync).toLocaleTimeString('it-IT') : ''}${st.pending ? ` · ${st.pending} modifiche da inviare` : ''}</p>
+      ${st.error ? `<p class="small warn">${esc(st.error)}</p>` : ''}
+      <div class="row gap"><button class="btn grow" id="snow">Sincronizza ora</button><button class="btn grow" id="sall">Invia tutti i miei dati</button></div>
+      <button class="btn danger block mt" id="soff">Scollega questo telefono</button>
+      <p class="small muted mt">Scollegando, i dati restano su questo telefono ma non si aggiornano più.</p>`;
+    el.querySelector('#snow').onclick = async () => {
+      try { const r = await sync.syncNow(); toast(`Inviati ${r.sent}, ricevuti ${r.received}`); if (r.received) route(); } catch (e) { toast(e.message, 4000); }
+    };
+    el.querySelector('#sall').onclick = async () => {
+      if (!(await confirmDialog('Inviare all\'archivio condiviso tutti i dati presenti su questo telefono? Se un dato è stato modificato più di recente da un altro mister, resta quello più recente.', 'Invia'))) return;
+      const n = await db.queueAll();
+      try { await sync.syncNow(); toast(`${n} elementi inviati`); } catch (e) { toast(e.message, 4000); }
+    };
+    el.querySelector('#soff').onclick = async () => {
+      if (!(await confirmDialog('Scollegare questo telefono dall\'archivio condiviso?', 'Scollega'))) return;
+      await sync.disconnect();
+      route();
+    };
+  };
+  const off = sync.onStatus(draw);
+  // smette di ascoltare quando si cambia pagina
+  window.addEventListener('hashchange', off, { once: true });
 }
 
 export async function exportBackup() {

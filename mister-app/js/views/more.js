@@ -31,8 +31,8 @@ export async function onboardingView(root) {
       <div class="row gap"><input id="joincode" class="grow code-input" placeholder="Codice di accesso" autocomplete="off" autocapitalize="off"><button class="btn primary" id="join">Entra</button></div>
     </div>
     <div class="card">
-      <p class="muted small">Hai già un backup? </p>
-      <button class="btn block" id="restore">Ripristina da file di backup</button>
+      <p class="muted small">Hai un file di backup o un file rose (squadre e giocatori)?</p>
+      <button class="btn block" id="restore">Apri file</button>
     </div>`;
   $('#join', root).onclick = async () => {
     const code = $('#joincode', root).value;
@@ -92,6 +92,8 @@ export async function moreView(root) {
         <button class="btn primary grow" data-action="export">Esporta backup</button>
         <button class="btn grow" data-action="import">Importa backup</button>
       </div>
+      <button class="btn block mt" data-action="importRose">Importa rose (squadre e giocatori)</button>
+      <p class="small muted">"Importa rose" aggiunge squadre e giocatori da un file preparato (es. dagli elenchi Excel della società) senza cancellare i dati presenti.</p>
     </div>
 
     <h2 class="section">File di tracking</h2>
@@ -126,6 +128,7 @@ export async function moreView(root) {
   renderSyncCard($('#syncCard', root), teams.length > 0);
   on(root, 'export', exportBackup);
   on(root, 'import', restoreBackup);
+  on(root, 'importRose', importRose);
   on(root, 'merge', () => mergePlayers(players));
   on(root, 'fields', () => editCustomFields(team));
   on(root, 'wipe', async () => {
@@ -205,6 +208,7 @@ async function restoreBackup() {
   try {
     const json = JSON.parse(await readText(file));
     if (json.app !== 'mister-app') throw new Error('Questo file non è un backup del Diario del Mister.');
+    if (json.kind === 'rose') { await mergeRose(json); return; }
     const n = (json.data.players || []).length, m = (json.data.matches || []).length;
     if (!(await confirmDialog(`Il backup contiene ${n} giocatori e ${m} partite. I dati attuali su questo dispositivo verranno SOSTITUITI. Continuare?`, 'Ripristina', true))) return;
     await db.importAll(json);
@@ -215,6 +219,54 @@ async function restoreBackup() {
   } catch (e) {
     toast(e.message || 'File non valido', 4000);
   }
+}
+
+// ---------- Importazione rose (unione, non sostituzione) ----------
+
+async function importRose() {
+  const file = await chooseFile('application/json,.json');
+  if (!file) return;
+  try {
+    const json = JSON.parse(await readText(file));
+    if (json.app !== 'mister-app' || !json.data) throw new Error('File non valido.');
+    await mergeRose(json);
+  } catch (e) {
+    toast(e.message || 'File non valido', 4000);
+  }
+}
+
+/** Aggiunge squadre, stagioni e giocatori. I dati già presenti (es. numeri inseriti a mano) hanno la precedenza. */
+async function mergeRose(json) {
+  const teams = json.data.teams || [], seasons = json.data.seasons || [], players = json.data.players || [];
+  const summary = teams.map((t) => `• ${t.name}: ${players.filter((p) => p.teamId === t.id).length} giocatori`).join('\n');
+  if (!(await confirmDialog(`Importare ${teams.length} squadre e ${players.length} giocatori?\n${summary}\n\nI dati già presenti non vengono cancellati.`, 'Importa'))) return;
+  const filled = (v) => v !== '' && v != null && !(Array.isArray(v) && !v.length);
+  const merge = (imp, cur) => {
+    if (!cur) return imp;
+    const out = { ...imp };
+    Object.entries(cur).forEach(([k, v]) => { if (filled(v) && k !== 'custom' && k !== 'customFields') out[k] = v; });
+    if (imp.custom || cur.custom) {
+      out.custom = { ...(imp.custom || {}) };
+      Object.entries(cur.custom || {}).forEach(([k, v]) => { if (filled(v)) out.custom[k] = v; });
+    }
+    if (imp.customFields || cur.customFields) {
+      const ids = new Set((cur.customFields || []).map((c) => c.id));
+      out.customFields = [...(cur.customFields || []), ...(imp.customFields || []).filter((c) => !ids.has(c.id))];
+    }
+    return out;
+  };
+  const write = async (name, list) => {
+    const out = [];
+    for (const r of list) out.push(merge({ ...r }, await db.get(name, r.id)));
+    await db.putMany(name, out);
+  };
+  await write('teams', teams);
+  await write('seasons', seasons);
+  await write('players', players);
+  if (!state.teamId && teams[0]) await setCurrent(teams[0].id, seasons.find((s) => s.teamId === teams[0].id)?.id || null);
+  toast(`Importate ${teams.length} squadre e ${players.length} giocatori`);
+  location.hash = '#/altro';
+  route();
 }
 
 // ---------- Unione giocatori ----------

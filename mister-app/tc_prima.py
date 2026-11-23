@@ -74,16 +74,28 @@ for i, (date, opp, home, res, tm) in enumerate(G):
 GOALS = {'Bajrami Denis': 6, 'Cicchi Alex': 6, 'Genovese Giovanni': 5, 'Sdringola Emanuele': 2, 'Bianchi Jacopo': 1, 'Casale Cristian': 1,
          'Chiucchiu Edoardo': 1, 'Coulibaly Nahoua': 1, 'Emidi Mattia': 1, 'Lombardi Andrea': 1, 'Righetti Alessandro': 1}
 scorers = [{'name': n, 'playerId': pid.get(n), 'gol': g, 'rigori': 0, 'assist': 0} for n, g in GOALS.items()]
-# classifica: visti solo il Palazzo (capolista, calcolato dai risultati) e le ultime due
 STANDINGS = [
     (1, 'Calcio Palazzo', 31, 12, 10, 1, 1, 27, 9, 18, 'promozione'),
+    (2, 'Julia Spello Castello', 27, 12, 8, 3, 1, None, None, 20, 'playoff'),
+    (3, 'La Castellana 1969', 26, 12, 8, 2, 2, None, None, 13, 'playoff'),
+    (4, 'Pontano', 24, 12, 7, 3, 2, None, None, 8, 'playoff'),
+    (5, 'Real Virtus', 23, 12, 7, 2, 3, None, None, 11, 'playoff'),
+    (6, 'Costano', 23, 12, 7, 2, 3, None, None, 10, None),
+    (7, 'Vis Foligno', 21, 12, 6, 3, 3, None, None, 2, None),
+    (8, 'Vigor N. Gualdo Bastardo', 19, 12, 6, 1, 5, None, None, 3, None),
+    (9, 'San Luca Calcio', 17, 12, 5, 2, 5, None, None, -2, None),
+    (10, 'Superga 48', 13, 12, 2, 7, 3, None, None, -1, None),
+    (11, 'Nocera Umbra 2017', 10, 12, 2, 4, 6, None, None, 3, None),
+    (12, 'Mevania Calcio', 10, 12, 3, 1, 8, None, None, -10, 'playout'),
+    (13, 'Athletic Club Bastia', 8, 12, 2, 2, 8, None, None, -12, 'playout'),
+    (14, 'C4 Foligno', 7, 12, 2, 1, 9, None, None, -10, 'playout'),
     (15, 'Cascia', 7, 12, 2, 1, 9, None, None, -19, 'playout'),
     (16, 'Grifo Cannara', 4, 12, 1, 1, 10, None, None, -34, 'retrocessione'),
 ]
 team['tcStats'] = {
     'fonte': 'Tuttocampo', 'aggiornato': '2026-11-23', 'campionato': 'Prima Categoria – Girone C',
-    'classifica': [{**dict(zip(['pos', 'squadra', 'pt', 'g', 'v', 'n', 'p', 'gf', 'gs', 'dr'], r[:10])), 'zona': r[10]} for r in STANDINGS],
-    'classificaCompleta': False,
+    'classifica': [{**dict(zip(['pos', 'squadra', 'pt', 'g', 'v', 'n', 'p', 'gf', 'gs', 'dr'], r[:10])), **({'zona': r[10]} if r[10] else {})} for r in STANDINGS],
+    'classificaCompleta': True,
     'legenda': {'promozione': 'Promozione', 'playoff': 'Playoff', 'playout': 'Playout', 'retrocessione': 'Seconda Categoria'},
     'marcatori': scorers,
     'evidenza': ['Capolista del campionato', 'Imbattuta da 8 partite', 'In gol da 12 partite consecutive',
